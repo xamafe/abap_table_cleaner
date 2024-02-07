@@ -24,7 +24,7 @@ FUNCTION z_secure_rfc_read_table.
 *"      DATA_BUFFER_EXCEEDED
 *"      RFC_READ_TABLE_OTHERS
 *"----------------------------------------------------------------------
-  AUTHORITY-CHECK OBJECT 'ZRFCSEC'
+  AUTHORITY-CHECK OBJECT 'ZSECRFC'
                   ID 'ACTVT' FIELD '03'
                   ID 'TABLE' FIELD query_table.
   IF sy-subrc <> 0.
