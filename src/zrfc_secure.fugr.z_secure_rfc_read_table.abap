@@ -31,6 +31,14 @@ FUNCTION z_secure_rfc_read_table.
     RAISE not_authorized.
   ENDIF.
 
+  DATA(table_cleaner) = zcl_table_cleaner=>create( query_table ).
+  IF table_cleaner IS BOUND
+    AND table_cleaner->get_block( ) = abap_true.
+    RAISE not_authorized.
+  ELSEIF table_cleaner IS BOUND.
+    table_cleaner->clean_input( CHANGING ch_fields = fields[] ).
+  ENDIF.
+
   CALL FUNCTION 'RFC_READ_TABLE'
     EXPORTING
       query_table          = query_table
@@ -65,8 +73,5 @@ FUNCTION z_secure_rfc_read_table.
     WHEN 7. RAISE rfc_read_table_others.
   ENDCASE.
 
-  DATA(table_cleaner) = zcl_table_cleaner=>create( query_table ).
-  IF table_cleaner IS BOUND.
-    table_cleaner->clean( CHANGING ch_table_content = !et_data ).
-  ENDIF.
+
 ENDFUNCTION.

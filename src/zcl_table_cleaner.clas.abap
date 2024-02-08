@@ -4,13 +4,10 @@ CLASS zcl_table_cleaner DEFINITION
 
   PUBLIC SECTION.
     INTERFACES zif_table_cleaner.
-    ALIASES: set_table_content FOR zif_table_cleaner~set_table_content,
-             get_table_name FOR zif_table_cleaner~get_table_name,
-             get_table_content FOR zif_table_cleaner~get_table_content,
+    ALIASES: get_table_name FOR zif_table_cleaner~get_table_name,
              get_block FOR zif_table_cleaner~get_block,
              get_fields FOR zif_table_cleaner~get_fields,
-             ty_fields FOR zif_table_cleaner~ty_fields,
-             clean FOR zif_table_cleaner~clean.
+             ty_fields FOR zif_table_cleaner~ty_fields.
 
     CLASS-METHODS create
       IMPORTING
@@ -26,9 +23,8 @@ CLASS zcl_table_cleaner DEFINITION
   PROTECTED SECTION.
   PRIVATE SECTION.
     DATA table_name TYPE tabname.
-    DATA table_content TYPE REF TO data.
     DATA block TYPE abap_bool.
-    DATA fields TYPE STANDARD TABLE OF fieldname.
+    DATA fields TYPE SORTED TABLE OF fieldname WITH UNIQUE DEFAULT KEY.
     METHODS set_table_name IMPORTING i_table_name TYPE tabname.
 ENDCLASS.
 
@@ -48,17 +44,8 @@ CLASS zcl_table_cleaner IMPLEMENTATION.
     me->table_name = i_table_name.
   ENDMETHOD.
 
-  METHOD zif_table_cleaner~get_table_content.
-    r_result = me->table_content.
-  ENDMETHOD.
-
-  METHOD zif_table_cleaner~set_table_content.
-    me->table_content = i_table_content.
-  ENDMETHOD.
-
-
   METHOD create.
-    SELECT FROM ztable_clener
+    SELECT FROM ztable_cleaner
         FIELDS *
         WHERE table_name = @i_query_table
         INTO TABLE @DATA(restrictions).
@@ -69,6 +56,7 @@ CLASS zcl_table_cleaner IMPLEMENTATION.
     table_cleaner->set_block( restrictions[ 1 ]-block ).
     table_cleaner->set_fields( VALUE #( FOR restriction IN restrictions
                                         ( restriction-field_name ) ) ).
+    r_result = table_cleaner.
   ENDMETHOD.
 
   METHOD zif_table_cleaner~get_block.
@@ -87,25 +75,11 @@ CLASS zcl_table_cleaner IMPLEMENTATION.
     me->fields = i_fields.
   ENDMETHOD.
 
-  METHOD zif_table_cleaner~clean.
-    FIELD-SYMBOLS <table> TYPE table.
-    IF table_content IS BOUND.
-      ASSIGN table_content->* TO <table>.
-    ELSEIF ch_table_content IS SUPPLIED.
-      ASSIGN ch_table_content TO <table>.
-    ENDIF.
+  METHOD zif_table_cleaner~clean_input.
 
-    IF get_block( ) = abap_true.
-      FREE <table>.
-      EXIT.
-    ENDIF.
+    "TODO: If empty get whole table...
 
-    LOOP AT get_fields( ) ASSIGNING FIELD-SYMBOL(<field_name>).
-      LOOP AT <table> ASSIGNING FIELD-SYMBOL(<line>).
-        ASSIGN COMPONENT <field_name> OF STRUCTURE <line> TO FIELD-SYMBOL(<field>).
-        FREE <field>.
-      ENDLOOP.
-    ENDLOOP.
+    ch_fields = FILTER #( ch_fields EXCEPT IN get_fields( ) WHERE fieldname = table_line  ).
 
   ENDMETHOD.
 

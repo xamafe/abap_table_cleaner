@@ -5,12 +5,23 @@
    <TOBJ>
     <OBJCT>ZSECRFC</OBJCT>
     <FIEL1>ACTVT</FIEL1>
+    <FIEL2>TABLE</FIEL2>
+    <OCLSS>BC_A</OCLSS>
    </TOBJ>
    <TOBJT>
     <LANGU>E</LANGU>
     <OBJECT>ZSECRFC</OBJECT>
-    <TTEXT>&lt; Shorttext for Object &gt;</TTEXT>
+    <TTEXT>secure rfc</TTEXT>
    </TOBJT>
+   <TOBJVORFLG>
+    <OBJCT>ZSECRFC</OBJCT>
+   </TOBJVORFLG>
+   <TACTZ>
+    <TACTZ>
+     <BROBJ>ZSECRFC</BROBJ>
+     <ACTVT>03</ACTVT>
+    </TACTZ>
+   </TACTZ>
   </asx:values>
  </asx:abap>
 </abapGit>
